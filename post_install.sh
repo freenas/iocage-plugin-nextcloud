@@ -26,6 +26,6 @@ mkdir -p /usr/local/www/nextcloud/tmp >/dev/null 2>/dev/null
 chmod o-rwx /usr/local/www/nextcloud/tmp
 
 # Start the service
-service nginx start
-service mysql-server start
-service php-fpm start
+service nginx start 2>/dev/null
+service mysql-server start 2>/dev/null
+service php-fpm start 2>/dev/null
