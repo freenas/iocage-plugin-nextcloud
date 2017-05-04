@@ -14,16 +14,19 @@ service nginx start 2>/dev/null
 service php-fpm start 2>/dev/null
 service mysql-server start 2>/dev/null
 
-PASS="$(LC_ALL=C; cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)"
 USER="nextcloud"
 DB="nextcloud"
 
-echo "Database Name: $DB"
+# Save the config values
 echo "$DB" > /root/dbname
-echo "Database User: $USER"
 echo "$USER" > /root/dbuser
+export LC_ALL=C
+cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1 > /root/dbpassword
+PASS=`cat /root/dbpassword`
+
+echo "Database Name: $DB"
+echo "Database User: $USER"
 echo "Database Password: $PASS"
-echo "$PASS" > /root/dbpassword
 
 # Configure mysql
 mysql -u root <<-EOF
