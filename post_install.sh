@@ -7,7 +7,11 @@ sysrc -f /etc/rc.conf php_fpm_enable="YES"
 
 cp /usr/local/etc/php.ini-production /usr/local/etc/php.ini
 
-cp /usr/local/share/mysql/my-small.cnf /var/db/mysql/my.cnf
+#cp /usr/local/share/mysql/my-small.cnf /var/db/mysql/my.cnf
+if [ ! -d "/usr/local/www/nextcloud/tmp" ] ; then
+  mkdir -p /usr/local/www/nextcloud/tmp
+fi
+chown -R www:www /usr/local/www/nextcloud/tmp
 
 # Start the service
 service nginx start 2>/dev/null
