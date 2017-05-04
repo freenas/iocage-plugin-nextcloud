@@ -14,16 +14,24 @@ service nginx start 2>/dev/null
 service php-fpm start 2>/dev/null
 service mysql-server start 2>/dev/null
 
+PASS=$(LC_ALL=C; cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
+USER="nextcloud"
+DB="nextcloud"
+
+echo "$DB" > /root/dbname
+echo "$USER" > /root/dbuser
+echo "$PASS" > /root/dbpassword
+
 # Configure mysql
 mysql -u root <<-EOF
-UPDATE mysql.user SET Password=PASSWORD('nextcloud') WHERE User='root';
+UPDATE mysql.user SET Password=PASSWORD('${PASS}') WHERE User='root';
 DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
 DELETE FROM mysql.user WHERE User='';
 DELETE FROM mysql.db WHERE Db='test' OR Db='test_%';
 
-CREATE DATABASE nextclouddb CHARACTER SET utf8;
-CREATE USER 'nextclouduser'@'localhost' IDENTIFIED BY 'nextcloud';
-GRANT ALL PRIVILEGES ON nextclouddb.* TO 'nextclouduser'@'localhost';
+CREATE DATABASE ${DB} CHARACTER SET utf8;
+CREATE USER '${USER}'@'localhost' IDENTIFIED BY '${PASS}';
+GRANT ALL PRIVILEGES ON ${DB}.* TO '${USER}'@'localhost';
 FLUSH PRIVILEGES;
 EOF
 
