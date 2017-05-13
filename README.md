@@ -1,2 +1,2 @@
-# iocage-plugin-syncthing
-Artifact file(s) for Syncthing iocage plugin
+# iocage-plugin-nextcloud
+Artifact file(s) for NextCloud iocage plugin
