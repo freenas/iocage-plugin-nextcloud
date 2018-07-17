@@ -7,10 +7,6 @@ sysrc -f /etc/rc.conf php_fpm_enable="YES"
 
 cp /usr/local/etc/php.ini-production /usr/local/etc/php.ini
 
-#cp /usr/local/share/mysql/my-small.cnf /var/db/mysql/my.cnf
-if [ ! -d "/usr/local/www/nextcloud/tmp" ] ; then
-  mkdir -p /usr/local/www/nextcloud/tmp
-fi
 chown -R www:www /usr/local/www/nextcloud/tmp
 
 # Start the service
@@ -44,5 +40,6 @@ FLUSH PRIVILEGES;
 EOF
 
 mkdir -p /usr/local/www/nextcloud/tmp >/dev/null 2>/dev/null
-chmod o-rwx /usr/local/www/nextcloud/tmp
+chmod -R o-rwx /usr/local/www/nextcloud
+chown -R www:www /usr/local/www/nextcloud
 
