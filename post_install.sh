@@ -7,14 +7,14 @@ sysrc -f /etc/rc.conf php_fpm_enable="YES"
 
 cp /usr/local/etc/php.ini-production /usr/local/etc/php.ini
 
-chown -R www:www /usr/local/www/nextcloud/tmp
-
 # Start the service
 service nginx start 2>/dev/null
 service php-fpm start 2>/dev/null
 service mysql-server start 2>/dev/null
 
-USER="nextcloud"
+
+#https://docs.nextcloud.com/server/13/admin_manual/installation/installation_wizard.html follow the docu install
+USER="dbadmin"
 DB="nextcloud"
 
 # Save the config values
@@ -35,7 +35,7 @@ DELETE FROM mysql.user WHERE User='';
 DELETE FROM mysql.db WHERE Db='test' OR Db='test_%';
 
 CREATE USER '${USER}'@'localhost' IDENTIFIED BY '${PASS}';
-GRANT ALL PRIVILEGES ON *.* TO '${USER}'@'localhost';
+GRANT ALL PRIVILEGES ON *.* TO '${USER}'@'localhost' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
 EOF
 
