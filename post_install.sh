@@ -28,7 +28,6 @@ export LC_ALL=C
 cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1 > /root/dbpassword
 PASS=`cat /root/dbpassword`
 
-echo "Database Name: $DB"
 echo "Database User: $USER"
 echo "Database Password: $PASS"
 
@@ -39,9 +38,8 @@ DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.
 DELETE FROM mysql.user WHERE User='';
 DELETE FROM mysql.db WHERE Db='test' OR Db='test_%';
 
-CREATE DATABASE ${DB} CHARACTER SET utf8;
 CREATE USER '${USER}'@'localhost' IDENTIFIED BY '${PASS}';
-GRANT ALL PRIVILEGES ON ${DB}.* TO '${USER}'@'localhost';
+GRANT ALL PRIVILEGES ON *.* TO '${USER}'@'localhost';
 FLUSH PRIVILEGES;
 EOF
 
