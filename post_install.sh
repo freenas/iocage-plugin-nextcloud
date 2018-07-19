@@ -1,5 +1,8 @@
 #!/bin/sh
 
+#dirty workaround to fix flavor ports
+pkg install -y nextcloud-php71
+
 # Enable the service
 sysrc -f /etc/rc.conf nginx_enable="YES"
 sysrc -f /etc/rc.conf mysql_enable="YES"
