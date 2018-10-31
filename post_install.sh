@@ -48,3 +48,4 @@ EOF
 mkdir -p /usr/local/www/nextcloud/tmp >/dev/null 2>/dev/null
 chmod o-rwx /usr/local/www/nextcloud/tmp
 
+alias occ ./occ.sh
