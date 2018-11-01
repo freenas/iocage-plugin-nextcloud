@@ -47,6 +47,7 @@ EOF
 
 echo >> .cshrc
 echo alias occ ./occ.sh >> .cshrc
+echo 'su -m www -c php\ ``/usr/local/www/nextcloud/occ\ "$*"``' > /mnt/Prometheus/iocage/jails/nextcloud/root/root/occ.sh
 
 mkdir -p /usr/local/www/nextcloud-sessions-tmp >/dev/null 2>/dev/null
 chmod o-rwx /usr/local/www/nextcloud-sessions-tmp
