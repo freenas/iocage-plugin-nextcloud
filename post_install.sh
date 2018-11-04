@@ -12,7 +12,6 @@ service nginx start 2>/dev/null
 service php-fpm start 2>/dev/null
 service mysql-server start 2>/dev/null
 
-
 #https://docs.nextcloud.com/server/13/admin_manual/installation/installation_wizard.html do not use the same name for user and db
 USER="dbadmin"
 DB="nextcloud"
@@ -40,11 +39,23 @@ GRANT ALL PRIVILEGES ON ${DB}.* TO '${USER}'@'localhost';
 FLUSH PRIVILEGES;
 EOF
 
+#workaround for occ (in shell just use occ instead of su -m www -c "....")
+echo >> .cshrc
+echo alias occ ./occ.sh >> .cshrc
+echo 'su -m www -c php\ ``/usr/local/www/nextcloud/occ\ "$*"``' > ~/occ.sh
+chmod u+x ~/occ.sh
+
 #workaround for app-pkg
 sed -i '' "s|false|true|g" /usr/local/www/nextcloud/config/config.php
 
-mkdir -p /usr/local/www/nextcloud/tmp >/dev/null 2>/dev/null
+# create sessions tmp dir outside nextcloud installation
+mkdir -p /usr/local/www/nextcloud-sessions-tmp >/dev/null 2>/dev/null
+chmod o-rwx /usr/local/www/nextcloud-sessions-tmp
+chown -R www:www /usr/local/www/nextcloud-sessions-tmp
+
 chmod -R o-rwx /usr/local/www/nextcloud
+
+#updater needs this
 chown -R www:www /usr/local/www/nextcloud
 
 #restart the services to make sure we have pick up the new permission
@@ -54,3 +65,4 @@ sleep 5
 service nginx restart 2>/dev/null
 
 echo "Database Name: $DB"
+
