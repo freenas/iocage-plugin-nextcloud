@@ -40,6 +40,9 @@ GRANT ALL PRIVILEGES ON ${DB}.* TO '${USER}'@'localhost';
 FLUSH PRIVILEGES;
 EOF
 
+#workaround for app-pkg
+sed -i '' "s|false|true|g" /usr/local/www/nextcloud/config/config.php
+
 mkdir -p /usr/local/www/nextcloud/tmp >/dev/null 2>/dev/null
 chmod -R o-rwx /usr/local/www/nextcloud
 chown -R www:www /usr/local/www/nextcloud
