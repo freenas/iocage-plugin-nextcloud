@@ -47,4 +47,10 @@ mkdir -p /usr/local/www/nextcloud/tmp >/dev/null 2>/dev/null
 chmod -R o-rwx /usr/local/www/nextcloud
 chown -R www:www /usr/local/www/nextcloud
 
+#restart the services to make sure we have pick up the new permission
+service php-fpm restart 2>/dev/null
+#nginx restarts to fast while php is not fully started yet
+sleep 5
+service nginx restart 2>/dev/null
+
 echo "Database Name: $DB"
