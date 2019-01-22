@@ -15,6 +15,8 @@ sed -i '' 's/.*opcache.max_accelerated_files=.*/opcache.max_accelerated_files=10
 sed -i '' 's/.*opcache.memory_consumption=.*/opcache.memory_consumption=128/' /usr/local/etc/php.ini
 sed -i '' 's/.*opcache.save_comments=.*/opcache.save_comments=1/' /usr/local/etc/php.ini
 sed -i '' 's/.*opcache.revalidate_freq=.*/opcache.revalidate_freq=1/' /usr/local/etc/php.ini
+# recommended value of 512MB for php memory limit (avoid warning when running occ)
+sed -i '' 's/.*memory_limit.*/memory_limit=512M/' /usr/local/etc/php.ini
 
 # Start the service
 service nginx start 2>/dev/null
