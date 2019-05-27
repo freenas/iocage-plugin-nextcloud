@@ -43,8 +43,6 @@ NCPASS=`cat /root/ncpassword`
 
 echo "Nextcloud Admin User: $NCUSER"
 echo "Nextcloud Admin Password: $NCPASS"
-echo "Database User: $USER"
-echo "Database Password: $PASS"
 
 # Configure mysql
 mysql -u root <<-EOF
