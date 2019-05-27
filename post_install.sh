@@ -28,14 +28,20 @@ service mysql-server start 2>/dev/null
 #https://docs.nextcloud.com/server/13/admin_manual/installation/installation_wizard.html do not use the same name for user and db
 USER="dbadmin"
 DB="nextcloud"
+NCUSER="ncadmin"
 
 # Save the config values
 echo "$DB" > /root/dbname
 echo "$USER" > /root/dbuser
+echo "$NCUSER" > /root/ncuser
 export LC_ALL=C
 cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1 > /root/dbpassword
+cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1 > /root/ncpassword
 PASS=`cat /root/dbpassword`
+NCPASS=`cat /root/ncpassword`
 
+echo "Nextcloud Admin User: $NCUSER"
+echo "Nextcloud Admin Password: $NCPASS"
 echo "Database User: $USER"
 echo "Database Password: $PASS"
 
@@ -51,6 +57,9 @@ GRANT ALL PRIVILEGES ON *.* TO '${USER}'@'localhost' WITH GRANT OPTION;
 GRANT ALL PRIVILEGES ON ${DB}.* TO '${USER}'@'localhost';
 FLUSH PRIVILEGES;
 EOF
+
+#Use occ to complete Nextcloud installation
+su -m www -c "php /usr/local/www/nextcloud/occ maintenance:install --database=\"mysql\" --database-name=\"nextcloud\" --database-user=\"$USER\" --database-pass=\"$PASS\" --database-host=\"localhost\" --admin-user=\"$NCUSER\" --admin-pass=\"$NCPASS\" --data-dir=\"/usr/local/www/nextcloud/data\"" 
 
 #workaround for occ (in shell just use occ instead of su -m www -c "....")
 echo >> .cshrc
