@@ -36,9 +36,6 @@ export LC_ALL=C
 cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1 > /root/dbpassword
 PASS=`cat /root/dbpassword`
 
-echo "Database User: $USER"
-echo "Database Password: $PASS"
-
 # Configure mysql
 mysql -u root <<-EOF
 UPDATE mysql.user SET Password=PASSWORD('${PASS}') WHERE User='root';
@@ -77,5 +74,6 @@ service php-fpm restart 2>/dev/null
 sleep 5
 service nginx restart 2>/dev/null
 
-echo "Database Name: $DB"
-
+echo "Database Name: $DB" > /root/PLUGIN_INFO
+echo "Database User: $USER" >> /root/PLUGIN_INFO
+echo "Database Password: $PASS" >> /root/PLUGIN_INFO
