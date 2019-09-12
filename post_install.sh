@@ -74,6 +74,6 @@ service php-fpm restart 2>/dev/null
 sleep 5
 service nginx restart 2>/dev/null
 
-echo "Database Name: $DB" > /root/PLUGIN_INFO
-echo "Database User: $USER" >> /root/PLUGIN_INFO
-echo "Database Password: $PASS" >> /root/PLUGIN_INFO
+echo "Database Name: $DB" 
+echo "Database User: $USER"
+echo "Database Password: $PASS"
