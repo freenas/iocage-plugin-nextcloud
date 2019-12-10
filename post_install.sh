@@ -33,7 +33,7 @@ NCUSER="ncadmin"
 # Save the config values
 echo "$DB" > /root/dbname
 echo "$USER" > /root/dbuser
-echo "$NCUSER" > /root/ncuserr
+echo "$NCUSER" > /root/ncuser
 export LC_ALL=C
 cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1 > /root/dbpassword
 cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1 > /root/ncpassword
