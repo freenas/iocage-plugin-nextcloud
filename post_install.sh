@@ -40,6 +40,26 @@ cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1 > /root/ncpasswor
 PASS=`cat /root/dbpassword`
 NCPASS=`cat /root/ncpassword`
 
+if [ -e "/root/.mysql_secret" ] ; then
+   # Mysql > 57 sets a default PW on root
+   TMPPW=$(cat /root/.mysql_secret | grep -v "^#")
+   echo "SQL Temp Password: $TMPPW"
+
+# Configure mysql
+mysql -u root -p"${TMPPW}" --connect-expired-password <<-EOF
+ALTER USER 'root'@'localhost' IDENTIFIED BY '${PASS}';
+CREATE USER '${USER}'@'localhost' IDENTIFIED BY '${PASS}';
+GRANT ALL PRIVILEGES ON *.* TO '${USER}'@'localhost' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON ${DB}.* TO '${USER}'@'localhost';
+FLUSH PRIVILEGES;
+EOF
+
+# Make the default log directory
+mkdir /var/log/zm
+chown www:www /var/log/zm
+
+else
+   # Mysql <= 56 does not
 
 # Configure mysql
 mysql -u root <<-EOF
@@ -53,6 +73,7 @@ GRANT ALL PRIVILEGES ON *.* TO '${USER}'@'localhost' WITH GRANT OPTION;
 GRANT ALL PRIVILEGES ON ${DB}.* TO '${USER}'@'localhost';
 FLUSH PRIVILEGES;
 EOF
+fi
 
 #Use occ to complete Nextcloud installation
 su -m www -c "php /usr/local/www/nextcloud/occ maintenance:install --database=\"mysql\" --database-name=\"nextcloud\" --database-user=\"$USER\" --database-pass=\"$PASS\" --database-host=\"localhost\" --admin-user=\"$NCUSER\" --admin-pass=\"$NCPASS\" --data-dir=\"/usr/local/www/nextcloud/data\"" 
