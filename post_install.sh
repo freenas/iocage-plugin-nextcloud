@@ -78,6 +78,7 @@ fi
 # If on NAT, we need to use the HOST address as the IP
 if [ -z "$IOCAGE_PLUGIN_IP" ] ; then
 	IOCAGE_PLUGIN_IP=$(cat /etc/iocage-env | grep HOST_ADDRESS= | cut -d '=' -f 2)
+	echo "Using NAT Address: $IOCAGE_PLUGIN_IP"
 fi
 
 #Use occ to complete Nextcloud installation
