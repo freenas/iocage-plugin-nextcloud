@@ -19,6 +19,13 @@ sed -i '' 's/.*opcache.revalidate_freq=.*/opcache.revalidate_freq=1/' /usr/local
 sed -i '' 's/.*memory_limit.*/memory_limit=512M/' /usr/local/etc/php.ini
 # recommended value of 10 (instead of 5) to avoid timeout
 sed -i '' 's/.*pm.max_children.*/pm.max_children=10/' /usr/local/etc/php-fpm.d/nextcloud.conf
+# Nextcloud wants PATH environment variable set.  Use the same
+# environment variables found in the 'www' php-fpm configuration for
+# Nextcloud.
+if [ -e /usr/local/etc/php-fpm.d/www.conf ] ; then
+    cat /usr/local/etc/php-fpm.d/www.conf |
+        grep "^env\[" >> /usr/local/etc/php-fpm.d/nextcloud.conf
+fi
 
 # Start the service
 service nginx start 2>/dev/null
