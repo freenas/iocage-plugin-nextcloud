@@ -117,7 +117,7 @@ sed -i '' "s|false|true|g" /usr/local/www/nextcloud/config/config.php
 mkdir -p /usr/local/www/nextcloud-sessions-tmp >/dev/null 2>/dev/null
 chmod o-rwx /usr/local/www/nextcloud-sessions-tmp
 chown -R www:www /usr/local/www/nextcloud-sessions-tmp
-chown -R www:www /usr/local/www/nextcloud/app-pkgs
+chown -R www:www /usr/local/www/nextcloud/apps-pkg
 
 chmod -R o-rwx /usr/local/www/nextcloud
 
