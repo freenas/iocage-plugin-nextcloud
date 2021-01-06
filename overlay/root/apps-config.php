@@ -1,3 +1,5 @@
+<?php
+$CONFIG = array (
   'apps_paths' =>
   array (
     0 =>

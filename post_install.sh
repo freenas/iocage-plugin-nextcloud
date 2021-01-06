@@ -102,8 +102,7 @@ fi
 
 # Fix the config file to include apps-pkg which is FreeBSD's way of keeping pkg apps
 # away from user installed
-sed 's|^);||g' /usr/local/www/nextcloud/config/config.php > /root/config.php.new
-cat /root/config.php.new /root/apps-config.php > /usr/local/www/nextcloud/config/config.php
+mv /root/apps-config.php /usr/local/www/nextcloud/config/config.php
 chown www:www /usr/local/www/nextcloud/config/config.php
 
 #Use occ to complete Nextcloud installation
