@@ -1,2 +1,2 @@
 # iocage-plugin-nextcloud
-Artifact file(s) for NextCloud iocage plugin
+Artifact file(s) for Nextcloud iocage plugin
