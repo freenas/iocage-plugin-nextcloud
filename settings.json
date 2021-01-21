@@ -20,7 +20,7 @@
 			"name": "Database Password",
 			"description": "Password to use for NextCloud Database setup",
 			"readonly": true
-		}
+		},
 		"ncuser": {
 			"type": "string",
 			"name": "Nextcloud Username",
