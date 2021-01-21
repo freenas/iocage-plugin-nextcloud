@@ -6,19 +6,19 @@
 		"dbname": {
 			"type": "string",
 			"name": "Database Name",
-			"description": "Database to use for NextCloud setup",
+			"description": "Database to use for Nextcloud setup",
 			"readonly": true
 		},
 		"dbuser": {
 			"type": "string",
 			"name": "Database Username",
-			"description": "Username to use for NextCloud Database setup",
+			"description": "Username to use for Nextcloud Database setup",
 			"readonly": true
 		},
 		"dbpassword": {
 			"type": "string",
 			"name": "Database Password",
-			"description": "Password to use for NextCloud Database setup",
+			"description": "Password to use for Nextcloud Database setup",
 			"readonly": true
 		},
 		"ncuser": {
