@@ -105,8 +105,12 @@ fi
 mv /root/apps-config.php /usr/local/www/nextcloud/config/config.php
 chown www:www /usr/local/www/nextcloud/config/config.php
 
+# Create nextcloud data folder outside of web root
+mkdir /usr/local/nextcloud-data-root
+chown www:www /usr/local/nextcloud-data-root
+
 #Use occ to complete Nextcloud installation
-su -m www -c "php /usr/local/www/nextcloud/occ maintenance:install --database=\"mysql\" --database-name=\"nextcloud\" --database-user=\"$USER\" --database-pass=\"$PASS\" --database-host=\"localhost\" --admin-user=\"$NCUSER\" --admin-pass=\"$NCPASS\" --data-dir=\"/usr/local/www/nextcloud/data\"" 
+su -m www -c "php /usr/local/www/nextcloud/occ maintenance:install --database=\"mysql\" --database-name=\"nextcloud\" --database-user=\"$USER\" --database-pass=\"$PASS\" --database-host=\"localhost\" --admin-user=\"$NCUSER\" --admin-pass=\"$NCPASS\" --data-dir=\"/usr/local/nextcloud-data-root\"" 
 su -m www -c "php /usr/local/www/nextcloud/occ config:system:set trusted_domains 1 --value=\"${IOCAGE_PLUGIN_IP}\""
 su -m www -c "php /usr/local/www/nextcloud/occ db:add-missing-indices"
 
@@ -142,3 +146,5 @@ echo "Database Password: $PASS" >> /root/PLUGIN_INFO
 
 echo "Nextcloud Admin User: $NCUSER" >> /root/PLUGIN_INFO
 echo "Nextcloud Admin Password: $NCPASS" >> /root/PLUGIN_INFO
+
+echo "Nextcloud root folder: /usr/local/nextcloud-data-root" >> /root/PLUGIN_INFO
