@@ -67,7 +67,7 @@ if [ -e "/root/.mysql_secret" ] ; then
 # Configure mysql
 mysql -u root -p"${TMPPW}" --connect-expired-password <<-EOF
 ALTER USER 'root'@'localhost' IDENTIFIED BY '${PASS}';
-CREATE USER '${USER}'@'localhost' IDENTIFIED BY '${PASS}';
+CREATE USER '${USER}'@'localhost' IDENTIFIED WITH mysql_native_password BY '${PASS}';
 GRANT ALL PRIVILEGES ON *.* TO '${USER}'@'localhost' WITH GRANT OPTION;
 GRANT ALL PRIVILEGES ON ${DB}.* TO '${USER}'@'localhost';
 FLUSH PRIVILEGES;
@@ -82,12 +82,12 @@ else
 
 # Configure mysql
 mysql -u root <<-EOF
-UPDATE mysql.user SET Password=PASSWORD('${PASS}') WHERE User='root';
+SET PASSWORD FOR 'root'@'localhost' = '${PASS}';
 DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
 DELETE FROM mysql.user WHERE User='';
 DELETE FROM mysql.db WHERE Db='test' OR Db='test_%';
 
-CREATE USER '${USER}'@'localhost' IDENTIFIED BY '${PASS}';
+CREATE USER '${USER}'@'localhost' IDENTIFIED WITH mysql_native_password BY '${PASS}';
 GRANT ALL PRIVILEGES ON *.* TO '${USER}'@'localhost' WITH GRANT OPTION;
 GRANT ALL PRIVILEGES ON ${DB}.* TO '${USER}'@'localhost';
 FLUSH PRIVILEGES;
