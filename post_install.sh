@@ -59,15 +59,11 @@ cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1 > /root/ncpasswor
 PASS=`cat /root/dbpassword`
 NCPASS=`cat /root/ncpassword`
 
-if [ -e "/root/.mysql_secret" ] ; then
-   # Mysql > 57 sets a default PW on root
-   TMPPW=$(cat /root/.mysql_secret | grep -v "^#")
-   echo "SQL Temp Password: $TMPPW"
-
 # Configure mysql
-mysql -u root -p"${TMPPW}" --connect-expired-password <<-EOF
-ALTER USER 'root'@'localhost' IDENTIFIED BY '${PASS}';
-CREATE USER '${USER}'@'localhost' IDENTIFIED BY '${PASS}';
+mysqladmin -u root password "${PASS}"
+mysql -u root -p"${PASS}" --connect-expired-password <<-EOF
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '${PASS}';
+CREATE USER '${USER}'@'localhost' IDENTIFIED WITH mysql_native_password BY '${PASS}';
 GRANT ALL PRIVILEGES ON *.* TO '${USER}'@'localhost' WITH GRANT OPTION;
 GRANT ALL PRIVILEGES ON ${DB}.* TO '${USER}'@'localhost';
 FLUSH PRIVILEGES;
@@ -76,23 +72,6 @@ EOF
 # Make the default log directory
 mkdir /var/log/zm
 chown www:www /var/log/zm
-
-else
-   # Mysql <= 56 does not
-
-# Configure mysql
-mysql -u root <<-EOF
-UPDATE mysql.user SET Password=PASSWORD('${PASS}') WHERE User='root';
-DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
-DELETE FROM mysql.user WHERE User='';
-DELETE FROM mysql.db WHERE Db='test' OR Db='test_%';
-
-CREATE USER '${USER}'@'localhost' IDENTIFIED BY '${PASS}';
-GRANT ALL PRIVILEGES ON *.* TO '${USER}'@'localhost' WITH GRANT OPTION;
-GRANT ALL PRIVILEGES ON ${DB}.* TO '${USER}'@'localhost';
-FLUSH PRIVILEGES;
-EOF
-fi
 
 # If on NAT, we need to use the HOST address as the IP
 if [ -e "/etc/iocage-env" ] ; then
