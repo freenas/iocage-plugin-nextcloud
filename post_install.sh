@@ -6,6 +6,7 @@ set -eu
 sysrc -f /etc/rc.conf nginx_enable="YES"
 sysrc -f /etc/rc.conf mysql_enable="YES"
 sysrc -f /etc/rc.conf php_fpm_enable="YES"
+sysrc -f /etc/rc.conf redis_enable="YES"
 
 # TODO: check nextcloud config
 CPCONFIG=0
@@ -31,13 +32,17 @@ sed -i '' 's/.*opcache.enable=.*/opcache.enable=1/' /usr/local/etc/php.ini
 sed -i '' 's/.*opcache.enable_cli=.*/opcache.enable_cli=1/' /usr/local/etc/php.ini
 sed -i '' 's/.*opcache.interned_strings_buffer=.*/opcache.interned_strings_buffer=8/' /usr/local/etc/php.ini
 sed -i '' 's/.*opcache.max_accelerated_files=.*/opcache.max_accelerated_files=10000/' /usr/local/etc/php.ini
-sed -i '' 's/.*opcache.memory_consumption=.*/opcache.memory_consumption=128/' /usr/local/etc/php.ini
+sed -i '' 's/.*opcache.memory_consumption=.*/opcache.memory_consumption=512/' /usr/local/etc/php.ini
 sed -i '' 's/.*opcache.save_comments=.*/opcache.save_comments=1/' /usr/local/etc/php.ini
 sed -i '' 's/.*opcache.revalidate_freq=.*/opcache.revalidate_freq=1/' /usr/local/etc/php.ini
 # recommended value of 512MB for php memory limit (avoid warning when running occ)
 sed -i '' 's/.*memory_limit.*/memory_limit=512M/' /usr/local/etc/php.ini
 # recommended value of 10 (instead of 5) to avoid timeout
 sed -i '' 's/.*pm.max_children.*/pm.max_children=10/' /usr/local/etc/php-fpm.d/nextcloud.conf
+
+sed -i '' 's/.*post_max_size.*/post_max_size=513M/' /usr/local/etc/php-fpm.d/nextcloud.conf
+sed -i '' 's/.*upload_max_filesize.*/upload_max_filesize=513M/' /usr/local/etc/php-fpm.d/nextcloud.conf
+
 # Nextcloud wants PATH environment variable set.
 echo "env[PATH] = $PATH" >> /usr/local/etc/php-fpm.d/nextcloud.conf
 
@@ -45,6 +50,7 @@ echo "env[PATH] = $PATH" >> /usr/local/etc/php-fpm.d/nextcloud.conf
 service nginx start 2>/dev/null
 service php-fpm start 2>/dev/null
 service mysql-server start 2>/dev/null
+service redis start 2>/dev/null
 
 # https://docs.nextcloud.com/server/13/admin_manual/installation/installation_wizard.html do not use the same name for user and db
 USER="dbadmin"
@@ -99,6 +105,12 @@ su -m www -c "php /usr/local/www/nextcloud/occ maintenance:install \
 
 # TODO: No domain name ?
 su -m www -c "php /usr/local/www/nextcloud/occ config:system:set trusted_domains 1 --value='${IOCAGE_PLUGIN_IP}'"
+
+# Enable caching
+# su -m www -c 'php /usr/local/www/nextcloud/occ config:system:set memcache.local --value="\\OC\\Memcache\\APCu"'
+su -m www -c 'php /usr/local/www/nextcloud/occ config:system:set redis host --value="localhost"'
+su -m www -c 'php /usr/local/www/nextcloud/occ config:system:set memcache.distributed --value="\\OC\\Memcache\\Redis"'
+su -m www -c 'php /usr/local/www/nextcloud/occ config:system:set memcache.locking --value="\\OC\\Memcache\\Redis"'
 
 # workaround for occ (in shell just use occ instead of su -m www -c "....")
 echo >> .cshrc
