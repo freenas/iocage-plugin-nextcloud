@@ -70,10 +70,9 @@ if [ -e "/etc/iocage-env" ] ; then
 	echo "Using NAT Address: $IOCAGE_PLUGIN_IP"
 fi
 
-# Fix the config file to include apps-pkg which is FreeBSD's way of keeping pkg apps
-# away from user installed
-mv /root/apps-config.php /usr/local/www/nextcloud/config/apps-config.php
-chown www:www /usr/local/www/nextcloud/config/apps-config.php
+mv /root/truenas.config.php /usr/local/www/nextcloud/config/truenas.config.php
+chown -R www:www /usr/local/www/nextcloud/config
+chmod -R u+rw /usr/local/www/nextcloud/config
 
 # Use occ to complete Nextcloud installation
 su -m www -c "php /usr/local/www/nextcloud/occ maintenance:install \
