@@ -8,23 +8,6 @@ sysrc -f /etc/rc.conf mysql_enable="YES"
 sysrc -f /etc/rc.conf php_fpm_enable="YES"
 sysrc -f /etc/rc.conf redis_enable="YES"
 
-# TODO: check nextcloud config
-CPCONFIG=0
-if [ -e "/usr/local/etc/nginx/conf.d/nextcloud.conf" ] ; then
-  # Confirm the config doesn't have user-changes. Update if not
-  if [ "$(md5 -q /usr/local/etc/nginx/conf.d/nextcloud.conf)" = "$(cat /usr/local/etc/nginx/conf.d/nextcloud.conf.checksum)" ] ; then
-	  CPCONFIG=1
-  fi
-else
-  CPCONFIG=1
-fi
-
-# Copy over the nginx config template
-if [ "$CPCONFIG" = "1" ] ; then
-  cp /usr/local/etc/nginx/conf.d/nextcloud.conf.template /usr/local/etc/nginx/conf.d/nextcloud.conf
-  md5 -q /usr/local/etc/nginx/conf.d/nextcloud.conf > /usr/local/etc/nginx/conf.d/nextcloud.conf.checksum
-fi
-
 cp /usr/local/etc/php.ini-production /usr/local/etc/php.ini
 # Modify opcache settings in php.ini according to Nextcloud documentation (remove comment and set recommended value)
 # https://docs.nextcloud.com/server/15/admin_manual/configuration_server/server_tuning.html#enable-php-opcache
