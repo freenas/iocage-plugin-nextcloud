@@ -8,27 +8,6 @@ sysrc -f /etc/rc.conf mysql_enable="YES"
 sysrc -f /etc/rc.conf php_fpm_enable="YES"
 sysrc -f /etc/rc.conf redis_enable="YES"
 
-cp /usr/local/etc/php.ini-production /usr/local/etc/php.ini
-# Modify opcache settings in php.ini according to Nextcloud documentation (remove comment and set recommended value)
-# https://docs.nextcloud.com/server/15/admin_manual/configuration_server/server_tuning.html#enable-php-opcache
-sed -i '' 's/.*opcache.enable=.*/opcache.enable=1/' /usr/local/etc/php.ini
-sed -i '' 's/.*opcache.enable_cli=.*/opcache.enable_cli=1/' /usr/local/etc/php.ini
-sed -i '' 's/.*opcache.interned_strings_buffer=.*/opcache.interned_strings_buffer=8/' /usr/local/etc/php.ini
-sed -i '' 's/.*opcache.max_accelerated_files=.*/opcache.max_accelerated_files=10000/' /usr/local/etc/php.ini
-sed -i '' 's/.*opcache.memory_consumption=.*/opcache.memory_consumption=512/' /usr/local/etc/php.ini
-sed -i '' 's/.*opcache.save_comments=.*/opcache.save_comments=1/' /usr/local/etc/php.ini
-sed -i '' 's/.*opcache.revalidate_freq=.*/opcache.revalidate_freq=1/' /usr/local/etc/php.ini
-# recommended value of 512MB for php memory limit (avoid warning when running occ)
-sed -i '' 's/.*memory_limit.*/memory_limit=512M/' /usr/local/etc/php.ini
-# recommended value of 10 (instead of 5) to avoid timeout
-sed -i '' 's/.*pm.max_children.*/pm.max_children=10/' /usr/local/etc/php-fpm.d/nextcloud.conf
-
-sed -i '' 's/.*post_max_size.*/post_max_size=513M/' /usr/local/etc/php-fpm.d/nextcloud.conf
-sed -i '' 's/.*upload_max_filesize.*/upload_max_filesize=513M/' /usr/local/etc/php-fpm.d/nextcloud.conf
-
-# Nextcloud wants PATH environment variable set.
-echo "env[PATH] = $PATH" >> /usr/local/etc/php-fpm.d/nextcloud.conf
-
 # Start the service
 service nginx start 2>/dev/null
 service php-fpm start 2>/dev/null
