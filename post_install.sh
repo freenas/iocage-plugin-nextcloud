@@ -67,12 +67,6 @@ su -m www -c "php /usr/local/www/nextcloud/occ maintenance:install \
 # TODO: No domain name ?
 su -m www -c "php /usr/local/www/nextcloud/occ config:system:set trusted_domains 1 --value='${IOCAGE_PLUGIN_IP}'"
 
-# Enable caching
-# su -m www -c 'php /usr/local/www/nextcloud/occ config:system:set memcache.local --value="\\OC\\Memcache\\APCu"'
-su -m www -c 'php /usr/local/www/nextcloud/occ config:system:set redis host --value="localhost"'
-su -m www -c 'php /usr/local/www/nextcloud/occ config:system:set memcache.distributed --value="\\OC\\Memcache\\Redis"'
-su -m www -c 'php /usr/local/www/nextcloud/occ config:system:set memcache.locking --value="\\OC\\Memcache\\Redis"'
-
 # workaround for occ (in shell just use occ instead of su -m www -c "....")
 echo >> .cshrc
 echo alias occ ~/occ.sh >> .cshrc
