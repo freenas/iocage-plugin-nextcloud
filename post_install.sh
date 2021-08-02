@@ -7,6 +7,7 @@ sysrc -f /etc/rc.conf nginx_enable="YES"
 sysrc -f /etc/rc.conf mysql_enable="YES"
 sysrc -f /etc/rc.conf php_fpm_enable="YES"
 sysrc -f /etc/rc.conf redis_enable="YES"
+sysrc -f /etc/rc.conf fail2ban_enable="YES"
 
 # Start the service
 service nginx start 2>/dev/null
@@ -78,6 +79,9 @@ mkdir -p /usr/local/www/nextcloud-sessions-tmp >/dev/null 2>/dev/null
 chmod o-rwx /usr/local/www/nextcloud-sessions-tmp
 chown -R www:www /usr/local/www/nextcloud-sessions-tmp
 chown -R www:www /usr/local/www/nextcloud/apps-pkg
+
+# Starting fail2ban
+service fail2ban start 2>/dev/null
 
 # Removing rwx permission on the nextcloud folder to others users
 chmod -R o-rwx /usr/local/www/nextcloud
