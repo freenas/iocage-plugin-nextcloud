@@ -65,6 +65,8 @@ su -m www -c "php /usr/local/www/nextcloud/occ maintenance:install \
   --admin-pass=\"$NCPASS\" \
   --data-dir=\"/usr/local/www/nextcloud/data\""
 
+su -m www -c "php /usr/local/www/nextcloud/occ background:cron"
+
 # TODO: No domain name ?
 su -m www -c "php /usr/local/www/nextcloud/occ config:system:set trusted_domains 1 --value='${IOCAGE_PLUGIN_IP}'"
 
