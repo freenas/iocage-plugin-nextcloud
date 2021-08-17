@@ -70,6 +70,13 @@ su -m www -c "php /usr/local/www/nextcloud/occ background:cron"
 # TODO: No domain name ?
 su -m www -c "php /usr/local/www/nextcloud/occ config:system:set trusted_domains 1 --value='${IOCAGE_PLUGIN_IP}'"
 
+su -m www -c "php /usr/local/www/nextcloud/occ app:install contacts"
+su -m www -c "php /usr/local/www/nextcloud/occ app:install calendar"
+su -m www -c "php /usr/local/www/nextcloud/occ app:install notes"
+su -m www -c "php /usr/local/www/nextcloud/occ app:install deck"
+su -m www -c "php /usr/local/www/nextcloud/occ app:install spreed"
+su -m www -c "php /usr/local/www/nextcloud/occ app:install mail"
+
 # workaround for occ (in shell just use occ instead of su -m www -c "....")
 echo >> .cshrc
 echo alias occ ~/occ.sh >> .cshrc
