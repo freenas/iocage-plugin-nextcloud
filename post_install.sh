@@ -2,6 +2,14 @@
 
 set -eu
 
+. /root/scripts/load_env.sh
+
+# Generate TLS certificates
+/root/scripts/generate_self_signed_tls_certificates.sh
+
+# Generate nginx configuration from the base template
+envsubst "\${IOCAGE_HOST_PORT}" < "/usr/local/etc/nginx/conf.d/nextcloud.conf.template" > "/usr/local/etc/nginx/conf.d/nextcloud.conf"
+
 # Enable the necessary services
 sysrc -f /etc/rc.conf nginx_enable="YES"
 sysrc -f /etc/rc.conf mysql_enable="YES"
@@ -25,8 +33,8 @@ echo "$DB" > /root/dbname
 echo "$USER" > /root/dbuser
 echo "$NCUSER" > /root/ncuser
 export LC_ALL=C
-cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1 > /root/dbpassword
-cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1 > /root/ncpassword
+openssl rand --hex 16 > /root/dbpassword
+openssl rand --hex 16 > /root/ncpassword
 PASS=$(cat /root/dbpassword)
 NCPASS=$(cat /root/ncpassword)
 
@@ -43,12 +51,6 @@ EOF
 # Make the default log directory
 mkdir /var/log/zm
 chown www:www /var/log/zm
-
-# If on NAT, we need to use the HOST address as the IP
-if [ -e "/etc/iocage-env" ] ; then
-	IOCAGE_PLUGIN_IP=$(cat /etc/iocage-env | grep HOST_ADDRESS= | cut -d '=' -f 2)
-	echo "Using NAT Address: $IOCAGE_PLUGIN_IP"
-fi
 
 mv /root/truenas.config.php /usr/local/www/nextcloud/config/truenas.config.php
 chown -R www:www /usr/local/www/nextcloud/config
@@ -67,8 +69,7 @@ su -m www -c "php /usr/local/www/nextcloud/occ maintenance:install \
 
 su -m www -c "php /usr/local/www/nextcloud/occ background:cron"
 
-# TODO: No domain name ?
-su -m www -c "php /usr/local/www/nextcloud/occ config:system:set trusted_domains 1 --value='${IOCAGE_PLUGIN_IP}'"
+su -m www -c "php /usr/local/www/nextcloud/occ config:system:set trusted_domains 1 --value='${IOCAGE_HOST_ADDRESS}'"
 
 su -m www -c "php /usr/local/www/nextcloud/occ app:install contacts"
 su -m www -c "php /usr/local/www/nextcloud/occ app:install calendar"
