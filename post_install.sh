@@ -6,9 +6,7 @@ set -eu
 
 # Generate TLS certificates
 /root/scripts/generate_self_signed_tls_certificates.sh
-
-# Generate nginx configuration from the base template
-envsubst "\${IOCAGE_HOST_PORT}" < "/usr/local/etc/nginx/conf.d/nextcloud.conf.template" > "/usr/local/etc/nginx/conf.d/nextcloud.conf"
+/root/scripts/sync_configuration.sh
 
 # Enable the necessary services
 sysrc -f /etc/rc.conf nginx_enable="YES"
@@ -33,8 +31,8 @@ echo "$DB" > /root/dbname
 echo "$USER" > /root/dbuser
 echo "$NCUSER" > /root/ncuser
 export LC_ALL=C
-openssl rand --hex 16 > /root/dbpassword
-openssl rand --hex 16 > /root/ncpassword
+openssl rand --hex 8 > /root/dbpassword
+openssl rand --hex 8 > /root/ncpassword
 PASS=$(cat /root/dbpassword)
 NCPASS=$(cat /root/ncpassword)
 
@@ -51,10 +49,6 @@ EOF
 # Make the default log directory
 mkdir /var/log/zm
 chown www:www /var/log/zm
-
-mv /root/truenas.config.php /usr/local/www/nextcloud/config/truenas.config.php
-chown -R www:www /usr/local/www/nextcloud/config
-chmod -R u+rw /usr/local/www/nextcloud/config
 
 # Use occ to complete Nextcloud installation
 su -m www -c "php /usr/local/www/nextcloud/occ maintenance:install \
