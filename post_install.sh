@@ -75,12 +75,6 @@ su -m www -c "php /usr/local/www/nextcloud/occ app:install deck"
 su -m www -c "php /usr/local/www/nextcloud/occ app:install spreed"
 su -m www -c "php /usr/local/www/nextcloud/occ app:install mail"
 
-# workaround for occ (in shell just use occ instead of su -m www -c "....")
-echo >> .cshrc
-echo alias occ ~/occ.sh >> .cshrc
-echo 'su -m www -c php\ ``/usr/local/www/nextcloud/occ\ "$*"``' > ~/occ.sh
-chmod u+x ~/occ.sh
-
 # create sessions tmp dir outside nextcloud installation
 mkdir -p /usr/local/www/nextcloud-sessions-tmp >/dev/null 2>/dev/null
 chmod o-rwx /usr/local/www/nextcloud-sessions-tmp

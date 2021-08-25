@@ -1,0 +1,5 @@
+#!/bin/sh
+
+set -eu
+
+su -m www -c "php /usr/local/www/nextcloud/occ $*"
