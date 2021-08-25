@@ -3,7 +3,7 @@
 set -eu
 
 # Load environment variable from /etc/iocage-env
-. /root/scripts/load_env.sh
+. /usr/local/bin/load_env
 
 # Generate some configuration from templates.
-/root/scripts/sync_configuration.sh
+/usr/local/bin/sync_configuration
