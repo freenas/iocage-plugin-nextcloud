@@ -13,7 +13,7 @@ if [ ! -f "$cert_path/root.cer" ]
 then
 	# Creating root CA.
 	openssl req \
-		-days 3650 \
+		-days 90 \
 		-nodes \
 		-x509 \
 		-new \
@@ -33,7 +33,7 @@ openssl req \
 
 # Signing certificate with root CA.
 openssl x509 \
-	-days 3650 \
+	-days 90 \
 	-req \
 	-in "$cert_path/server.csr" \
 	-CA "$cert_path/root.cer" \
