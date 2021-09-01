@@ -2,6 +2,25 @@
 
 Artifact file(s) for Nextcloud iocage plugin
 
+## New HTTPS requirement
+
+One major change of the latest update is the switch to HTTPS. This means that all communications with Nextcloud will now be completely secure.
+But for TrueNAS setups that uses NAT, admins will have to manually add a new port binding before upgrading Nextcloud.
+
+- Stop the Nextcloud Plugin from the TrueNAS GUI
+- Go to the "Jails" in the TrueNAS web GUI.
+- Click on "Edit" for the Nextcloud Jail.
+- Open the "Network Properties" tab.
+- Add a new port binding at the bottom of the tab. The "Protocol" must be TCP, the "Jail Port Number" must be 443 and the "Host Port Number" can be any port that is free on your TrueNAS server.
+- Restart the Nextcloud plugin.
+
+Those steps can also be run after the upgrade, but you will need to run two commands so Nginx can take the change into account. Log into the Nextcloud plugin from the "Shell": `iocage console <nextcloud_plugin_name>`.
+
+```bash
+sync_configuration
+service nginx restart
+```
+
 ## Nextcloud Hub
 
 Nextcloud comme preloaded with the default Hub and Groupware bundles containing the following applications:

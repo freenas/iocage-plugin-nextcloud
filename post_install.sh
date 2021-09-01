@@ -3,13 +3,13 @@
 set -eu
 
 # Load environment variable from /etc/iocage-env
-. /usr/local/bin/load_env
+. load_env
 
 # Generate some configuration from templates.
-/usr/local/bin/sync_configuration
+sync_configuration
 
 # Generate self-signed TLS certificates
-/usr/local/bin/generate_self_signed_tls_certificates
+generate_self_signed_tls_certificates
 
 # Enable the necessary services
 sysrc -f /etc/rc.conf nginx_enable="YES"

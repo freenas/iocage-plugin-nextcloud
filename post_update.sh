@@ -2,29 +2,31 @@
 
 set -eu
 
-# Load environment variable from /etc/iocage-env
-. /usr/local/bin/load_env
-
-# Generate certificates if there is none
-if [ ! -e /usr/local/etc/letsencrypt/live/truenas ]
+# Run migrations in /root/migrations.
+if [ ! -e /root/migrations/current_migration.txt ]
 then
-	generate_self_signed_tls_certificates
-	sysrc -f /etc/rc.conf redis_enable="YES"
-	sysrc -f /etc/rc.conf fail2ban_enable="YES"
-	service redis start 2>/dev/null
-	service fail2ban start 2>/dev/null
-
-	su -m www -c "php /usr/local/www/nextcloud/occ background:cron"
-	su -m www -c "php /usr/local/www/nextcloud/occ app:install contacts"
-	su -m www -c "php /usr/local/www/nextcloud/occ app:install calendar"
-	su -m www -c "php /usr/local/www/nextcloud/occ app:install notes"
-	su -m www -c "php /usr/local/www/nextcloud/occ app:install deck"
-	su -m www -c "php /usr/local/www/nextcloud/occ app:install spreed"
-	su -m www -c "php /usr/local/www/nextcloud/occ app:install mail"
+	echo "0" > /root/migrations/current_migration.txt
 fi
 
+current_migration=$(cat /root/migrations/current_migration.txt)
+while [ -f "/root/migrations/$((current_migration+1)).sh" ]
+do
+	echo "* [migrate] Migrating from $current_migration to $((current_migration+1))."
+
+	{
+		"/root/migrations/$((current_migration+1)).sh" &&
+		current_migration=$((current_migration+1)) &&
+		echo "* [migrate] Migration $current_migration done." &&
+		echo "$current_migration" > /root/migrations/current_migration.txt
+	} || {
+		echo "ERROR - Fail to run migrations."
+		# Do not exit so the post_update script can continue.
+		break
+	}
+done
+
 # Generate some configuration from templates.
-/usr/local/bin/sync_configuration
+sync_configuration
 
 # Removing rwx permission on the nextcloud folder to others users
 chmod -R o-rwx /usr/local/www/nextcloud

@@ -2,7 +2,7 @@
 
 set -eu
 
-. /usr/local/bin/load_env
+. load_env
 
 cert_path=/usr/local/etc/letsencrypt/live/truenas
 
