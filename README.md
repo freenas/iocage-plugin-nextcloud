@@ -42,20 +42,14 @@ sync_configuration
 service nginx restart
 ```
 
-Then add your domain to Nextcloud known hosts in `/usr/local/www/nextcloud/config/config.php`
+Then add your domain to Nextcloud known hosts in `/usr/local/www/nextcloud/config/config.php`.
 
 ## Technical details
 
 - Fail2ban is configured to ban users for 24h after 3 wrong connection attempt in a 12h time frame.
-- Cron job are executed by the system
-- Nextcloud make use of Redis and APCu for caching
-- Database migrations needs to be regularly run after version updates.
-
-```bash
-occ --no-interaction db:add-missing-columns
-occ --no-interaction db:add-missing-indices
-occ --no-interaction db:add-missing-primary-keys
-```
+- Cron job are executed by the system.
+- Nextcloud make use of Redis and APCu for caching.
+- Database migrations needs to be regularly run after version updates. You can use the `run_db_migrations` command to run them.
 
 ## Updates
 

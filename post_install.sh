@@ -86,7 +86,6 @@ service fail2ban start 2>/dev/null
 
 # Removing rwx permission on the nextcloud folder to others users
 chmod -R o-rwx /usr/local/www/nextcloud
-
 # Give full ownership of the nextcloud directory to www
 chown -R www:www /usr/local/www/nextcloud
 

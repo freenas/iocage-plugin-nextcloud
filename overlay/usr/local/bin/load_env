@@ -4,31 +4,43 @@ set -eu
 
 export IOCAGE_NETWORKING_MODE
 export IOCAGE_NAT_FORWARDS
-export IOCAGE_HOST_PORT_HTTP
-export IOCAGE_JAIL_PORT_HTTP
-export IOCAGE_HOST_PORT_HTTPS
-export IOCAGE_JAIL_PORT_HTTPS
+export IOCAGE_HOST_PORT_HTTP=80
+export IOCAGE_JAIL_PORT_HTTP=80
+export IOCAGE_HOST_PORT_HTTPS=443
+export IOCAGE_JAIL_PORT_HTTPS=443
 export IOCAGE_HOST_ADDRESS
 export IOCAGE_HOST_ADDRESS_BCAST
 
-if [ -e "/etc/iocage-env" ]
+if [ ! -e "/etc/iocage-env" ]
 then
-	IOCAGE_NETWORKING_MODE=$(grep NETWORKING_MODE= /etc/iocage-env | cut -d '=' -f 2)
-
-	if [ "$IOCAGE_NETWORKING_MODE" = "nat" ]
-	then
-		IOCAGE_NAT_FORWARDS=$(grep NAT_FORWARDS= /etc/iocage-env | cut -d '=' -f 2)
-		IOCAGE_HOST_PORT_HTTP=$(echo "$IOCAGE_NAT_FORWARDS" | cut -d ',' -f1 | cut -d ':' -f2 | cut -d ')' -f1)
-		IOCAGE_JAIL_PORT_HTTP=$(echo "$IOCAGE_NAT_FORWARDS" | cut -d ',' -f1 | cut -d ':' -f1 | cut -d '(' -f2)
-		IOCAGE_HOST_PORT_HTTPS=$(echo "$IOCAGE_NAT_FORWARDS" | cut -d ',' -f2 | cut -d ':' -f2 | cut -d ')' -f1)
-		IOCAGE_JAIL_PORT_HTTPS=$(echo "$IOCAGE_NAT_FORWARDS" | cut -d ',' -f2 | cut -d ':' -f1 | cut -d '(' -f2)
-	else
-		IOCAGE_HOST_PORT_HTTP=80
-		IOCAGE_JAIL_PORT_HTTP=80
-		IOCAGE_HOST_PORT_HTTPS=443
-		IOCAGE_JAIL_PORT_HTTPS=443
-	fi
-
-	IOCAGE_HOST_ADDRESS=$(grep HOST_ADDRESS= /etc/iocage-env | cut -d '=' -f 2)
-	IOCAGE_HOST_ADDRESS_BCAST=$(grep HOST_ADDRESS_BCAST= /etc/iocage-env | cut -d '=' -f 2)
+	exit 0
 fi
+
+IOCAGE_NETWORKING_MODE=$(grep NETWORKING_MODE= /etc/iocage-env | cut -d '=' -f 2)
+
+if [ "$IOCAGE_NETWORKING_MODE" = "nat" ]
+then
+	IOCAGE_NAT_FORWARDS=$(grep NAT_FORWARDS= /etc/iocage-env | cut -d '=' -f 2)
+
+	port_binding1=$(echo "$IOCAGE_NAT_FORWARDS" | cut -d ',' -f1)
+	port_binding2=$(echo "$IOCAGE_NAT_FORWARDS" | cut -d ',' -f2)
+
+	for port_binding in "$port_binding1" "$port_binding2"
+	do
+		host_port=$(echo "$port_binding" | cut -d ':' -f2 | cut -d ')' -f1)
+		jail_port=$(echo "$port_binding" | cut -d ':' -f1 | cut -d '(' -f2)
+
+		if [ "$jail_port" = "80" ]
+		then
+			IOCAGE_HOST_PORT_HTTP=$host_port
+			IOCAGE_JAIL_PORT_HTTP=$jail_port
+		elif [ "$jail_port" = "443" ]
+		then
+			IOCAGE_HOST_PORT_HTTPS=$host_port
+			IOCAGE_JAIL_PORT_HTTPS=$jail_port
+		fi
+	done
+fi
+
+IOCAGE_HOST_ADDRESS=$(grep HOST_ADDRESS= /etc/iocage-env | cut -d '=' -f 2)
+IOCAGE_HOST_ADDRESS_BCAST=$(grep HOST_ADDRESS_BCAST= /etc/iocage-env | cut -d '=' -f 2)
