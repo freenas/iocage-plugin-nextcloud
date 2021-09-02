@@ -63,6 +63,8 @@ service nginx restart
 
 Then add your domain to Nextcloud known hosts in `/usr/local/www/nextcloud/config/config.php`.
 
+In both case, self-signed or Letsencrypt issued, certificates are renewed every 90 days.
+
 ## Technical details
 
 - Fail2ban is configured to ban users for 24h after 3 wrong connection attempt in a 12h time frame.
