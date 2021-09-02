@@ -32,11 +32,20 @@ Nextcloud comme preloaded with the default Hub and Groupware bundles containing 
 - Mail
 - Talk
 
+## User limit
+
+This appliance is developed and maintained by Nextcloud GmbH and meant for private, or small business use. This is why the appliance is limited to 100 users. With more users comes a more critical role in organizations, for which we recommend Nextcloud Enterprise. The appliance can be upgraded to Nextcloud Enterprise. Contact Nextcloud for more information.
+
 ## TLS certificates
 
 The installation process generate self-signed TLS certificates. If you do not want your users to see a warning in their browser, you either need to install the root CA in all your users devices, or you need to generate some valid certificates with Letsencrypt or other certificates provider.
 
-To generate valid certificates with Letsencrypt, first, make sure that TrueNAS is configured to proxy requests using your domain name to Nextcloud. Then, you can run the following commands to install valid certificates:
+Certificate validity time:
+
+- Self-signed certificates are valid for two years. This is so not tech-savvy people do not have to go through the browser warning too frequently.
+- Letsencrypt certificates are valid for 90 days and a cron task will try to renew it every week.
+
+To generate valid certificates with Letsencrypt, first, make sure that TrueNAS is configured to proxy requests using your domain name to Nextcloud and that the Nextcloud jail is accessible through ports 80 and 443. You can then run the following commands to install valid certificates:
 
 ```bash
 # Remove self-signed certificates
@@ -61,9 +70,7 @@ sync_configuration
 service nginx restart
 ```
 
-Then add your domain to Nextcloud known hosts in `/usr/local/www/nextcloud/config/config.php`.
-
-In both case, self-signed or Letsencrypt issued, certificates are renewed every 90 days.
+Then add your domain to Nextcloud known hosts in: `/usr/local/www/nextcloud/config/config.php`.
 
 ## Technical details
 
@@ -75,7 +82,6 @@ In both case, self-signed or Letsencrypt issued, certificates are renewed every 
 ## Updates
 
 When you update the Nextcloud plugin, you should be careful to not skip any major version and to alway update to the last minor version before that.
-
 
 ## Scripts
 
@@ -97,7 +103,7 @@ Script called by cron to renew either self-signed or letsencrypt-issued certific
 
 - `run_db_migrations`:
 
-Nextcloud sometime need to run some long migrations after an update. This script will run them for you. Please run them when your server is in a low-usage time.
+Nextcloud sometime need to run some long migrations after an update. This script will help you to run them. Please run it when your server is in a low-usage time.
 
 - `sync_configuration`:
 
