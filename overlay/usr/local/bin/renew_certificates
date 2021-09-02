@@ -4,6 +4,12 @@ set -eu
 
 if certbot certificates | grep 'No certificates found'
 then
+	# Limit self-signed certificate renewal to on month before expiration
+	if cat /usr/local/etc/letsencrypt/live/truenas/server.cer | openssl x509 --checkend $((( 60*60*24*31 )))
+	then
+		exit 0
+	fi
+
 	generate_self_signed_tls_certificates
 else
 	certbot renew -q
