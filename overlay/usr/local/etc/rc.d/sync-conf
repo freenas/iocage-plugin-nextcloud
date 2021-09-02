@@ -1,0 +1,21 @@
+#!/bin/sh
+#
+# $FreeBSD$
+#
+
+# PROVIDE: sync-conf
+# BEFORE: nginx
+
+. /etc/rc.subr
+
+do_sync()
+{
+	/usr/local/bin/sync_configuration;
+}
+
+name="sync-conf"
+start_cmd='do_sync'
+stop_cmd=':'
+
+load_rc_config $name
+run_rc_command "$1"
