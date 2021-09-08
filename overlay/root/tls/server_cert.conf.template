@@ -6,6 +6,6 @@ distinguished_name = req_distinguished_name
 x509_extensions    = x509_ext
 [ req_distinguished_name ]
 organizationName = TrueNAS (Nextcloud)
-commonName = $IOCAGE_HOST_ADDRESS
+commonName = localhost
 [ x509_ext ]
 keyUsage=critical,digitalSignature,keyAgreement
