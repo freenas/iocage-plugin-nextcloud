@@ -10,7 +10,8 @@
 
 do_sync()
 {
-	/usr/local/bin/sync_configuration;
+	export PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:/root/bin
+	sync_configuration
 }
 
 name="sync-conf"

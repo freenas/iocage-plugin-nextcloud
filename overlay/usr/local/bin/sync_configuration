@@ -4,7 +4,6 @@ set -eu
 
 . load_env
 
-
 # Two cases:
 # - Nextcloud is accessed through <domain_name>: use port 443
 # - Nextcloud is accessed through <ip>:<port>: use port $IOCAGE_HOST_PORT_HTTPS
