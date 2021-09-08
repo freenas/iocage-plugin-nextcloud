@@ -12,6 +12,13 @@ service redis start 2>/dev/null
 service fail2ban start 2>/dev/null
 service mysql-server start 2>/dev/null
 
+# Wait for mysql to be up
+until mysql --user dbadmin --password="$(cat /root/dbpassword)" --execute "SHOW DATABASES" > /dev/null
+do
+    echo "MariaDB is unavailable - sleeping"
+    sleep 1
+done
+
 # Change cron execution method
 su -m www -c "php /usr/local/www/nextcloud/occ background:cron"
 
