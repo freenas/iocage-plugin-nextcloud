@@ -48,26 +48,7 @@ Certificate validity time:
 To generate valid certificates with Letsencrypt, first, make sure that TrueNAS is configured to proxy requests using your domain name to Nextcloud and that the Nextcloud jail is accessible through ports 80 and 443. You can then run the following commands to install valid certificates:
 
 ```bash
-# Remove self-signed certificates
-rm -rf /usr/local/etc/letsencrypt/truenas
-
-# Ask letsencrypt for some certificates
-certbot certonly \
-    --rsa-key-size 4096 \
-    --cert-name truenas \
-    --non-interactive \
-    --webroot \
-    --webroot-path /usr/local/www/nextcloud \
-    --force-renewal \
-    --agree-tos \
-    --email <your_email> \
-    --domain <your_domain_name>
-
-# Refresh nginx configuration to use 443 as HTTPS port
-sync_configuration
-
-# Restart nginx
-service nginx restart
+generate_letsencrypt_certificates <domain_name> <admin_email>
 ```
 
 Then add your domain to Nextcloud known hosts in: `/usr/local/www/nextcloud/config/config.php`.
