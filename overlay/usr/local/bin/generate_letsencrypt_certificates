@@ -21,12 +21,7 @@ fi
 
 # Move self-signed certificates
 tmp_backup="/tmp/$(openssl rand --hex 8)"
-mkdir --parent "$tmp_backup"
-if [ $? -eq 64 ]
-        mkdir -p "$tmp_backup"
-else
-        echo "Unable to create certificate backup" >&2
-fi
+mkdir -p "$tmp_backup"
 mv /usr/local/etc/letsencrypt/live/truenas "$tmp_backup"
 echo "Old certificates moved to: $tmp_backup"
 
