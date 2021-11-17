@@ -68,13 +68,25 @@ When you update the Nextcloud plugin, you should be careful to not skip any majo
 
 - `generate_self_signed_certificates`:
 
-This script will generate TLS certificates for you. It will place them here: `/usr/local/etc/letsencrypt/live/truenas`. It uses the letsencrypt directory so you do not have to touch the nginx configuration when switching to letsencrypt certificates. You can install the `root.cer` file into your devices and browsers to avoid the warning page when you access Nextcloud. If you run the command again, it will reuse the previous `root.cer` so you do not have to reinstall it.
+This script will generate self-signed TLS certificates for you. It will place them here: `/usr/local/etc/letsencrypt/live/truenas`. It uses the letsencrypt directory so you do not have to touch the nginx configuration when switching to letsencrypt certificates. You can install the `root.cer` file into your devices and browsers to avoid the warning page when you access Nextcloud. If you run the command again, it will reuse the previous `root.cer` so you do not have to reinstall it.
+
+- `generate_letsencrypt_certificates <domain_name> <admin_email>`:
+
+This script will generate valid TLS certificates with Let's encrypt. See the "TLS certificates" section above for more information.
 
 - `load_env`:
 
 Load and export environment variables from `/etc/iocage-env`. You can add it at the begging of your script to easily access those variables.
+This will also load the content of `/root/jail_options.env`.
 
-- `occ`:
+Example of `/root/jail_options.env`:
+
+```shell
+# Allow insecure access to Nextcloud through HTTP. Useful when TrueNAS is behind an external proxy.
+export ALLOW_INSECURE_ACCESS=<boolean> # default: false
+```
+
+- `occ [<occ command>]`:
 
 This is alias to ease the use of the Nextcloud CLI in a csh shell.
 
