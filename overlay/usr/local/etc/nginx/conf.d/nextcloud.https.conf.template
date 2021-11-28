@@ -1,0 +1,34 @@
+upstream php-handler {
+    server unix:/var/run/nextcloud-php-fpm.sock;
+}
+
+# Redirect to HTTPS
+server {
+    listen 80 default_server;
+    listen [::]:80;
+
+    location ^~ /.well-known/acme-challenge {
+        # Path to the root of your installation
+        root /usr/local/www/nextcloud/;
+        try_files $uri $uri/ =404;
+    }
+
+    location / {
+       return 301 https://$host:$NEXTCLOUD_HTTPS_PORT$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl http2;
+    server_name _;
+
+    # HSTS settings
+    # WARNING: Only add the preload option once you read about
+    # the consequences in https://hstspreload.org/. This option
+    # will add the domain to a hardcoded list that is shipped
+    # in all major browsers and getting removed from this list
+    # could take several months.
+    add_header Strict-Transport-Security "max-age=15768000; includeSubDomains;" always;
+
+    include conf.d/nextcloud.inc;
+}
