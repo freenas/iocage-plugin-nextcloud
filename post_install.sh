@@ -24,6 +24,8 @@ service php-fpm start 2>/dev/null
 service mysql-server start 2>/dev/null
 service redis start 2>/dev/null
 
+exit 0
+
 # https://docs.nextcloud.com/server/13/admin_manual/installation/installation_wizard.html do not use the same name for user and db
 USER="dbadmin"
 DB="nextcloud"
