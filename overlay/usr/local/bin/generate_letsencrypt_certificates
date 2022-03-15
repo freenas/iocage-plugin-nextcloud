@@ -1,0 +1,44 @@
+#!/bin/sh
+
+set -eu
+
+. load_env
+
+domain_name=${1:-}
+admin_email=${2:-}
+
+if [ "$domain_name" = "" ]
+then
+	echo "Please provide a domain name: generate_letsencrypt_certificates <domain_name> <admin_email>"
+	exit 1
+fi
+
+if [ "$admin_email" = "" ]
+then
+	echo "Please provide a admin email: generate_letsencrypt_certificates <domain_name> <admin_email>"
+	exit 1
+fi
+
+# Move self-signed certificates
+tmp_backup="/tmp/$(openssl rand --hex 8)"
+mkdir -p "$tmp_backup"
+mv /usr/local/etc/letsencrypt/live/truenas "$tmp_backup"
+echo "Old certificates moved to: $tmp_backup"
+
+# Ask letsencrypt for some certificates
+certbot certonly \
+    --rsa-key-size 4096 \
+    --cert-name truenas \
+    --non-interactive \
+    --webroot \
+    --webroot-path /usr/local/www/nextcloud \
+    --force-renewal \
+    --agree-tos \
+    --email "$admin_email" \
+    --domain "$domain_name"
+
+# Refresh nginx configuration to use 443 as HTTPS port
+sync_configuration
+
+# Restart nginx
+service nginx restart

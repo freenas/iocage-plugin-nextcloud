@@ -1,0 +1,22 @@
+#!/bin/sh
+#
+# $FreeBSD$
+#
+
+# PROVIDE: sync-conf
+# BEFORE: nginx
+
+. /etc/rc.subr
+
+do_sync()
+{
+	export PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:/root/bin
+	sync_configuration
+}
+
+name="sync-conf"
+start_cmd='do_sync'
+stop_cmd=':'
+
+load_rc_config $name
+run_rc_command "$1"

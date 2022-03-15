@@ -1,0 +1,28 @@
+#!/bin/sh
+
+set -eu
+
+. load_env
+
+# Two cases:
+# - Nextcloud is accessed through <domain_name>: use port 443
+# - Nextcloud is accessed through <ip>:<port>: use port $IOCAGE_HOST_PORT_HTTPS
+export NEXTCLOUD_HTTPS_PORT=443
+if certbot certificates | grep "No certificates found."
+then
+	NEXTCLOUD_HTTPS_PORT=$IOCAGE_HOST_PORT_HTTPS
+fi
+
+# Generate nginx configuration from the base template
+SCHEME=https
+if [ "${ALLOW_INSECURE_ACCESS:-false}" = "true" ]
+then
+	SCHEME=http
+fi
+
+envsubst "\${NEXTCLOUD_HTTPS_PORT}" < "/usr/local/etc/nginx/conf.d/nextcloud.$SCHEME.conf.template" > "/usr/local/etc/nginx/conf.d/nextcloud.conf"
+
+# Copy Nextcloud custom configuration
+cp /root/config/truenas.config.php /usr/local/www/nextcloud/config/truenas.config.php
+chown -R www:www /usr/local/www/nextcloud/config
+chmod -R u+rw /usr/local/www/nextcloud/config

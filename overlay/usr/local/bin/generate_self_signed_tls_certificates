@@ -1,0 +1,52 @@
+#!/bin/sh
+
+set -eu
+
+. load_env
+
+cert_path=/usr/local/etc/letsencrypt/live/truenas
+
+mkdir -p "$cert_path"
+
+# Prevent overriding existing root CA
+if [ ! -f "$cert_path/root.cer" ]
+then
+	# Creating root CA.
+	openssl req \
+		-days 730 \
+		-nodes \
+		-x509 \
+		-new \
+		-keyout "$cert_path/root.key" \
+		-out "$cert_path/root.cer" \
+		-config "/root/tls/root_ca.conf"
+fi
+
+# Generating TLS certificate.
+envsubst "\${IOCAGE_HOST_ADDRESS}" < "/root/tls/server_cert.conf.template" > "/root/tls/server_cert.conf"
+openssl req \
+	-nodes \
+	-new \
+	-keyout "$cert_path/server.key" \
+	-out "$cert_path/server.csr" \
+	-config "/root/tls/server_cert.conf"
+
+# Signing certificate with root CA.
+openssl x509 \
+	-days 730 \
+	-req \
+	-in "$cert_path/server.csr" \
+	-CA "$cert_path/root.cer" \
+	-CAkey "$cert_path/root.key" \
+	-set_serial 0x"$(openssl rand --hex 16)" \
+	-out "$cert_path/server.cer" \
+	-extfile "/root/tls/server_cert.conf" \
+	-extensions x509_ext
+
+# Copy certificates to Nginx exploitable files.
+cp "$cert_path/server.cer" "$cert_path/fullchain.pem"
+cp "$cert_path/server.key" "$cert_path/privkey.pem"
+cp "$cert_path/root.cer" "$cert_path/chain.pem"
+
+echo ""
+echo "You can install the following CA on your devices to trust the TLS certificate: $cert_path/root.cer"

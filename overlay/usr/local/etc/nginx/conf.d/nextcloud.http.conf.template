@@ -1,0 +1,16 @@
+upstream php-handler {
+    server unix:/var/run/nextcloud-php-fpm.sock;
+}
+
+server {
+    listen 80 default_server;
+    listen [::]:80;
+
+    location ^~ /.well-known/acme-challenge {
+        # Path to the root of your installation
+        root /usr/local/www/nextcloud/;
+        try_files $uri $uri/ =404;
+    }
+
+    include conf.d/nextcloud.inc;
+}
