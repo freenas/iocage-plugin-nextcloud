@@ -66,7 +66,7 @@ su -m www -c "php /usr/local/www/nextcloud/occ maintenance:install \
 
 su -m www -c "php /usr/local/www/nextcloud/occ background:cron"
 
-su -m www -c "php /usr/local/www/nextcloud/occ config:system:set trusted_domains 1 --value='${IOCAGE_HOST_ADDRESS}'"
+su -m www -c "php /usr/local/www/nextcloud/occ config:system:set trusted_domains 1 --value='${IOCAGE_HOST_SUBNET}.*'"
 
 su -m www -c "php /usr/local/www/nextcloud/occ app:install contacts"
 su -m www -c "php /usr/local/www/nextcloud/occ app:install calendar"
