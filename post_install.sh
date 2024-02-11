@@ -21,7 +21,7 @@ sysrc -f /etc/rc.conf fail2ban_enable="YES"
 # Start the service
 service nginx start 2>/dev/null
 service php-fpm start 2>/dev/null
-service mysql-server start 2>/dev/null
+service mysql-server start 2> /dev/null
 service redis start 2>/dev/null
 
 # https://docs.nextcloud.com/server/13/admin_manual/installation/installation_wizard.html do not use the same name for user and db
@@ -42,8 +42,8 @@ NCPASS=$(cat /root/ncpassword)
 # Configure mysql
 mysqladmin -u root password "${PASS}"
 mysql -u root -p"${PASS}" --connect-expired-password <<-EOF
-ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '${PASS}';
-CREATE USER '${USER}'@'localhost' IDENTIFIED WITH mysql_native_password BY '${PASS}';
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password USING PASSWORD('${PASS}');
+CREATE USER '${USER}'@'localhost' IDENTIFIED WITH mysql_native_password USING PASSWORD('${PASS}');
 GRANT ALL PRIVILEGES ON *.* TO '${USER}'@'localhost' WITH GRANT OPTION;
 GRANT ALL PRIVILEGES ON ${DB}.* TO '${USER}'@'localhost';
 FLUSH PRIVILEGES;
@@ -59,14 +59,14 @@ su -m www -c "php /usr/local/www/nextcloud/occ maintenance:install \
   --database-name=\"nextcloud\" \
   --database-user=\"$USER\" \
   --database-pass=\"$PASS\" \
-  --database-host=\"localhost\" \
+  --database-host=\"127.0.0.1\" \
   --admin-user=\"$NCUSER\" \
   --admin-pass=\"$NCPASS\" \
   --data-dir=\"/usr/local/www/nextcloud/data\""
 
 su -m www -c "php /usr/local/www/nextcloud/occ background:cron"
 
-su -m www -c "php /usr/local/www/nextcloud/occ config:system:set trusted_domains 1 --value='${IOCAGE_HOST_ADDRESS}'"
+su -m www -c "php /usr/local/www/nextcloud/occ config:system:set trusted_domains 1 --value='${IOCAGE_HOST_SUBNET}.*'"
 
 su -m www -c "php /usr/local/www/nextcloud/occ app:install contacts"
 su -m www -c "php /usr/local/www/nextcloud/occ app:install calendar"
