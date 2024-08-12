@@ -50,3 +50,4 @@ fi
 
 IOCAGE_HOST_ADDRESS=$(grep HOST_ADDRESS= /etc/iocage-env | cut -d '=' -f 2)
 IOCAGE_HOST_ADDRESS_BCAST=$(grep HOST_ADDRESS_BCAST= /etc/iocage-env | cut -d '=' -f 2)
+IOCAGE_HOST_SUBNET=$(echo "$IOCAGE_HOST_ADDRESS" | cut -d '.' -f 1-3)

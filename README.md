@@ -83,7 +83,7 @@ Example of `/root/jail_options.env`:
 
 ```shell
 # Allow insecure access to Nextcloud through HTTP. Useful when TrueNAS is behind an external proxy.
-export ALLOW_INSECURE_ACCESS=<boolean> # default: false
+export ALLOW_INSECURE_ACCESS=<boolean> # default: true
 ```
 
 - `occ [<occ command>]`:

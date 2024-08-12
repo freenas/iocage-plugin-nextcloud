@@ -1,5 +1,9 @@
-# set max upload size
+# Path to the root of your installation
+root /usr/local/www/nextcloud/;
+
+# set max upload size and increase upload timeout:
 client_max_body_size 512M;
+client_body_timeout 300s;
 fastcgi_buffers 64 4K;
 
 # Enable gzip but do not remove ETag headers
@@ -8,26 +12,37 @@ gzip_vary on;
 gzip_comp_level 4;
 gzip_min_length 256;
 gzip_proxied expired no-cache no-store private no_last_modified no_etag auth;
-gzip_types application/atom+xml application/javascript application/json application/ld+json application/manifest+json application/rss+xml application/vnd.geo+json application/vnd.ms-fontobject application/x-font-ttf application/x-web-app-manifest+json application/xhtml+xml application/xml font/opentype image/bmp image/svg+xml image/x-icon text/cache-manifest text/css text/plain text/vcard text/vnd.rim.location.xloc text/vtt text/x-component text/x-cross-domain-policy;
+gzip_types application/atom+xml text/javascript application/javascript application/json application/ld+json application/manifest+json application/rss+xml application/vnd.geo+json application/vnd.ms-fontobject application/wasm application/x-font-ttf application/x-web-app-manifest+json application/xhtml+xml application/xml font/opentype image/bmp image/svg+xml image/x-icon text/cache-manifest text/css text/plain text/vcard text/vnd.rim.location.xloc text/vtt text/x-component text/x-cross-domain-policy;
 
 # Pagespeed is not supported by Nextcloud, so if your server is built
 # with the `ngx_pagespeed` module, uncomment this line to disable it.
 #pagespeed off;
 
+# The settings allows you to optimize the HTTP2 bandwidth.
+# See https://blog.cloudflare.com/delivering-http-2-upload-speed-improvements/
+# for tuning hints
+client_body_buffer_size 512k;
+
 # HTTP response headers borrowed from Nextcloud `.htaccess`
-add_header Referrer-Policy                      "no-referrer"   always;
-add_header X-Content-Type-Options               "nosniff"       always;
-add_header X-Download-Options                   "noopen"        always;
-add_header X-Frame-Options                      "SAMEORIGIN"    always;
-add_header X-Permitted-Cross-Domain-Policies    "none"          always;
-add_header X-Robots-Tag                         "none"          always;
-add_header X-XSS-Protection                     "1; mode=block" always;
+add_header Referrer-Policy                   "no-referrer"       always;
+add_header X-Content-Type-Options            "nosniff"           always;
+add_header X-Frame-Options                   "SAMEORIGIN"        always;
+add_header X-Permitted-Cross-Domain-Policies "none"              always;
+add_header X-Robots-Tag                      "noindex, nofollow" always;
+add_header X-XSS-Protection                  "1; mode=block"     always;
 
 # Remove X-Powered-By, which is an information leak
 fastcgi_hide_header X-Powered-By;
 
-# Path to the root of your installation
-root /usr/local/www/nextcloud/;
+# Set .mjs and .wasm MIME types
+# Either include it in the default mime.types list
+# and include that list explicitly or add the file extension
+# only for Nextcloud like below:
+include mime.types;
+types {
+    text/javascript mjs;
+	application/wasm wasm;
+}
 
 # Specify how to handle directories -- specifying `/index.php$request_uri`
 # here as the fallback means that Nginx always exhibits the desired behaviour
@@ -36,7 +51,7 @@ root /usr/local/www/nextcloud/;
 # that file is correctly served; if it doesn't, then the request is passed to
 # the front-end controller. This consistent behaviour means that we don't need
 # to specify custom rules for certain paths (e.g. images and other assets,
-# `/updater`, `/ocm-provider`, `/ocs-provider`), and thus
+# `/updater`, `/ocs-provider`), and thus
 # `try_files $uri $uri/ /index.php$request_uri`
 # always provides the desired behaviour.
 index index.php index.html /index.php$request_uri;
@@ -62,8 +77,6 @@ location ^~ /.well-known {
     # The rules in this block are an adaptation of the rules
     # in `.htaccess` that concern `/.well-known`.
 
-    # Needed to prevent including the scheme, domain and port in the Location header.
-    absolute_redirect off;
     location = /.well-known/carddav { return 301 /remote.php/dav/; }
     location = /.well-known/caldav  { return 301 /remote.php/dav/; }
 
@@ -85,7 +98,7 @@ location ~ ^/(?:\.|autotest|occ|issue|indie|db_|console)                { return
 # to the URI, resulting in a HTTP 500 error response.
 location ~ \.php(?:$|/) {
     # Required for legacy support
-    rewrite ^/(?!index|remote|public|cron|core\/ajax\/update|status|ocs\/v[12]|updater\/.+|oc[ms]-provider\/.+|.+\/richdocumentscode\/proxy) /index.php$request_uri;
+    rewrite ^/(?!index|remote|public|cron|core\/ajax\/update|status|ocs\/v[12]|updater\/.+|ocs-provider\/.+|.+\/richdocumentscode(_arm64)?\/proxy) /index.php$request_uri;
 
     fastcgi_split_path_info ^(.+?\.php)(/.*)$;
     set $path_info $fastcgi_path_info;
@@ -95,7 +108,7 @@ location ~ \.php(?:$|/) {
     include fastcgi_params;
     fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
     fastcgi_param PATH_INFO $path_info;
-    # fastcgi_param HTTPS on;
+    #fastcgi_param HTTPS on;
 
     fastcgi_param modHeadersAvailable true;         # Avoid sending the security headers twice
     fastcgi_param front_controller_active true;     # Enable pretty urls
@@ -103,11 +116,21 @@ location ~ \.php(?:$|/) {
 
     fastcgi_intercept_errors on;
     fastcgi_request_buffering off;
+
+    fastcgi_max_temp_file_size 0;
 }
 
-location ~ \.(?:css|js|svg|gif|png|jpg|ico)$ {
+# Serve static files
+location ~ \.(?:css|js|mjs|svg|gif|ico|jpg|png|webp|wasm|tflite|map|ogg|flac)$ {
     try_files $uri /index.php$request_uri;
-    expires 6M;         # Cache-Control policy borrowed from `.htaccess`
+    # HTTP response headers borrowed from Nextcloud `.htaccess`
+    add_header Cache-Control                     "public, max-age=15778463$asset_immutable";
+    add_header Referrer-Policy                   "no-referrer"       always;
+    add_header X-Content-Type-Options            "nosniff"           always;
+    add_header X-Frame-Options                   "SAMEORIGIN"        always;
+    add_header X-Permitted-Cross-Domain-Policies "none"              always;
+    add_header X-Robots-Tag                      "noindex, nofollow" always;
+    add_header X-XSS-Protection                  "1; mode=block"     always;
     access_log off;     # Optional: Don't log access to assets
 }
 

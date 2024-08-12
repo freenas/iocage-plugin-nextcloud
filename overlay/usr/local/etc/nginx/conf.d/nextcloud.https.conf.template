@@ -2,20 +2,19 @@ upstream php-handler {
     server unix:/var/run/nextcloud-php-fpm.sock;
 }
 
+# Set the `immutable` cache control options only for assets with a cache busting `v` argument
+map $arg_v $asset_immutable {
+    "" "";
+    default ", immutable";
+}
+
 # Redirect to HTTPS
 server {
     listen 80 default_server;
     listen [::]:80;
 
-    location ^~ /.well-known/acme-challenge {
-        # Path to the root of your installation
-        root /usr/local/www/nextcloud/;
-        try_files $uri $uri/ =404;
-    }
-
-    location / {
-       return 301 https://$host:$NEXTCLOUD_HTTPS_PORT$request_uri;
-    }
+    # Enforce HTTPS
+    return 301 https://$server_name$request_uri;
 }
 
 server {

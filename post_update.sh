@@ -25,6 +25,8 @@ do
 	}
 done
 
+# Remove old files
+rm -fv /usr/local/etc/php/php.truenas.ini
 # Generate some configuration from templates.
 sync_configuration
 
@@ -32,3 +34,6 @@ sync_configuration
 chmod -R o-rwx /usr/local/www/nextcloud
 # Give full ownership of the nextcloud directory to www
 chown -R www:www /usr/local/www/nextcloud
+
+# DB migration check
+run_db_migrations

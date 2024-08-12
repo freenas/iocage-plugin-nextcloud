@@ -2,6 +2,13 @@
 
 set -eu
 
+. load_env
+
+if [ "${ALLOW_INSECURE_ACCESS:-true}" = "true" ]
+then
+	exit 0
+fi
+
 if certbot certificates | grep 'No certificates found'
 then
 	# Limit self-signed certificate renewal to on month before expiration

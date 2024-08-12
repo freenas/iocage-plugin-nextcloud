@@ -2,15 +2,15 @@ upstream php-handler {
     server unix:/var/run/nextcloud-php-fpm.sock;
 }
 
+# Set the `immutable` cache control options only for assets with a cache busting `v` argument
+map $arg_v $asset_immutable {
+    "" "";
+    default ", immutable";
+}
+
 server {
     listen 80 default_server;
     listen [::]:80;
-
-    location ^~ /.well-known/acme-challenge {
-        # Path to the root of your installation
-        root /usr/local/www/nextcloud/;
-        try_files $uri $uri/ =404;
-    }
 
     include conf.d/nextcloud.inc;
 }
