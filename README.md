@@ -62,7 +62,7 @@ Then add your domain to Nextcloud known hosts in: `/usr/local/www/nextcloud/conf
 
 ## Updates
 
-When you update the Nextcloud plugin, you should be careful to not skip any major version and to alway update to the last minor version before that.
+When you update the Nextcloud plugin, you should be careful to not skip any major version and to always update to the last minor version before that.
 
 ## Scripts
 
